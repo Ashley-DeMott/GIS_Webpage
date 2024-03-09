@@ -4,9 +4,9 @@
 Creating a map that can be displayed within a webpage using ArcGIS
 
 ## Development Environment
-Node JS
-Visual Studio Code
-Dependencies installed from "Creating a Web App" tutorial (inital Vite vanilla Javascript project)
+* Node JS
+* Visual Studio Code
+* Dependencies installed from "Creating a Web App" tutorial (inital Vite vanilla Javascript project)
 
 ## Useful Websites
 * [ArcGIS Tutorials](https://developers.arcgis.com/javascript/latest/tutorials/)

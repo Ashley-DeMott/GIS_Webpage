@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:;base64,=" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>National Park Services GIS Data</title>
+  </head>
+  <body>
+    <!-- Everything outside the shell is overwritten-->
+    <calcite-shell>        
+        <!--<h1>National Park Services: Points of Interest</h1>-->
+        <calcite-navigation slot="header">
+          <calcite-navigation-logo slot="logo" />
+        </calcite-navigation>
+        <!-- The map of the world provided by arcGIS -->
+        <arcgis-map item-id="e691172598f04ea8881cd2a4adaa45ba" zoom="4">
+            <arcgis-layer-list position="top-right" />
+          </arcgis-map>
+      </calcite-shell>
+
+      <!-- Load the JS script at the end -->
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

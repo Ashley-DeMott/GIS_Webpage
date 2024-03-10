@@ -40,4 +40,3 @@ document.querySelector("arcgis-map").addEventListener("arcgisViewReadyChange", (
     //const layer = event.target.map.layers.find((layer) => layer.id === 
     //layer.popupTemplate.title = "National Park Services: Points of Interest";
   });
-  

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:;base64,=" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Map of Historic Places</title>
+    <!-- INSTRUCTIONS: 
+    To allow Cross origin requests that are run in JS,
+    1. Open file in command prompt
+    2. Enter "npm run dev"
+    3. Open browser and go to "localhost:5173"
+    -->
+  </head>
+  <body>
+    <!-- Everything outside the shell is overwritten-->
+    <calcite-shell>
+        <calcite-navigation slot="header">
+          <calcite-navigation-logo slot="logo" />
+        </calcite-navigation>
+        <!-- The Web Map to load -->
+        <!-- (Additional Web Maps) Recreation & Points of Interest: ebf09c3a14134689b9d7e1b6570eae91,
+        Accidental Deaths: e691172598f04ea8881cd2a4adaa45ba, 
+        NPS POI (as Web Service): 391c43cb01d74a00930cb2795de28d3b -->
+        <arcgis-map item-id="f710465868aa419397142467edf098d4" zoom="4">
+            <arcgis-layer-list position="top-right" />
+            
+          </arcgis-map>
+      </calcite-shell>
+
+      <!-- Load the JS script at the end -->
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

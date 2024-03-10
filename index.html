@@ -1,26 +1,490 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="data:;base64,=" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>National Park Services GIS Data</title>
-  </head>
-  <body>
-    <!-- Everything outside the shell is overwritten-->
-    <calcite-shell>        
-        <!--<h1>National Park Services: Points of Interest</h1>-->
-        <calcite-navigation slot="header">
-          <calcite-navigation-logo slot="logo" />
-        </calcite-navigation>
-        <!-- The map of the world provided by arcGIS -->
-        <arcgis-map item-id="e691172598f04ea8881cd2a4adaa45ba" zoom="4">
-            <arcgis-layer-list position="top-right" />
-          </arcgis-map>
-      </calcite-shell>
+<!-- ORIGINAL CODE FROM: https://developers.arcgis.com/calcite-design-system/tutorials/apply-core-concepts/-->
+<!-- FeatureServers available at https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services-->
+<!--
+Modifications by: Ashley DeMott
+Changed data set to one that includes visitors, injuries, and deaths from 2007 to 2020
 
-      <!-- Load the JS script at the end -->
-    <script type="module" src="/main.js"></script>
-    <script src="https://js.arcgis.com/4.29/"></script>
+TODO: Change popup data to specified group of columns (year, age, and type)
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Calcite Components: Core concepts</title>
+    <script type="module" src="https://js.arcgis.com/calcite-components/2.6.0/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.6.0/calcite.css" />
+
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css" />
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .calcite-tutorial {
+        --calcite-color-brand: #039851;
+        --calcite-color-brand-hover: #008d52;
+      }
+
+      .calcite-tutorial calcite-chip {
+        --calcite-color-foreground-2: var(--calcite-color-brand);
+        --calcite-color-text-1: white;
+        margin-inline-end: 0.75rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <calcite-shell class="calcite-tutorial">
+      <calcite-shell-panel slot="panel-start">
+        <calcite-panel heading="National Park Services: Park Mortality">
+          <calcite-block heading="Filters" open>
+            <div slot="control">
+              <calcite-action disabled icon="reset" id="control-reset-el"></calcite-action>
+              <calcite-tooltip label="Reset to defaults" reference-element="control-reset-el" position="bottom">
+                Reset to defaults
+              </calcite-tooltip>
+            </div>
+            <calcite-label>
+              Data type, per state
+              <calcite-segmented-control id="control-visited-type-el" width="full">
+                <calcite-segmented-control-item value="DESC" checked>Most Visitors</calcite-segmented-control-item>
+                <calcite-segmented-control-item value="ASC">Least Visitors</calcite-segmented-control-item>
+              </calcite-segmented-control>
+            </calcite-label>
+            <calcite-label>
+              Year data to display
+              <calcite-select id="control-year-el">
+                <calcite-option label="Total Visitors" value="TOTAL"></calcite-option>
+                <calcite-option label="2020 Visitors" value="F2020"></calcite-option>
+                <calcite-option label="2019 Visitors" value="F2019"></calcite-option>
+                <calcite-option label="2018 Visitors" value="F2018"></calcite-option>                
+                <calcite-option label="2017 Visitors" value="F2017"></calcite-option>
+                <calcite-option label="2016 Visitors" value="F2016"></calcite-option>
+                <calcite-option label="2015 Visitors" value="F2015"></calcite-option>
+                <calcite-option label="2014 Visitors" value="F2014"></calcite-option>                
+                <calcite-option label="2013 Visitors" value="F2013"></calcite-option>
+                <calcite-option label="2012 Visitors" value="F2012"></calcite-option>
+                <calcite-option label="2011 Visitors" value="F2011"></calcite-option>
+                <calcite-option label="2010 Visitors" value="F2010"></calcite-option>                
+                <calcite-option label="2009 Visitors" value="F2009"></calcite-option>
+                <calcite-option label="2008 Visitors" value="F2008"></calcite-option>
+                <calcite-option label="2007 Visitors" value="F2007"></calcite-option>
+
+                <calcite-option label="Total Deaths" value="Total_Deaths"></calcite-option>
+                <calcite-option label="2020 Deaths" value="Y_2020"></calcite-option>
+                <calcite-option label="2019 Deaths" value="Y_2019"></calcite-option>
+                <calcite-option label="2018 Deaths" value="Y_2018"></calcite-option>                
+                <calcite-option label="2017 Deaths" value="Y_2017"></calcite-option>
+                <calcite-option label="2016 Deaths" value="Y_2016"></calcite-option>
+                <calcite-option label="2015 Deaths" value="Y_2015"></calcite-option>
+                <calcite-option label="2014 Deaths" value="Y_2014"></calcite-option>                
+                <calcite-option label="2013 Deaths" value="Y_2013"></calcite-option>
+                <calcite-option label="2012 Deaths" value="Y_2012"></calcite-option>
+                <calcite-option label="2011 Deaths" value="Y_2011"></calcite-option>
+                <calcite-option label="2010 Deaths" value="Y_2010"></calcite-option>                
+                <calcite-option label="2009 Deaths" value="Y_2009"></calcite-option>
+                <calcite-option label="2008 Deaths" value="Y_2008"></calcite-option>
+                <calcite-option label="2007 Deaths" value="Y_2007"></calcite-option>
+              </calcite-select>
+            </calcite-label>
+            <calcite-label>
+            <calcite-select id="control-popup-el">
+                Data to show
+                <calcite-option id="Filter--Year">Year</calcite-option>
+                <calcite-option id="Filter--Age">Age</calcite-option>
+                <calcite-option id="Filter--Type">Type</calcite-option>
+            </calcite-select>
+            </calcite-label>
+          </calcite-block>
+          <calcite-block collapsible heading="Results" id="result-block">
+            <calcite-list id="result-list"></calcite-list>
+          </calcite-block>
+        </calcite-panel>
+      </calcite-shell-panel>
+
+      <div id="viewDiv"></div>
+    </calcite-shell>
   </body>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/symbols/WebStyleSymbol",
+      "esri/Basemap",
+      "esri/rest/support/TopFeaturesQuery",
+      "esri/rest/support/TopFilter",
+      "esri/widgets/Home"
+    ], (Map, MapView, FeatureLayer, WebStyleSymbol, Basemap, TopFeaturesQuery, TopFilter, Home) =>
+      (async () => {
+        const layer = new FeatureLayer({
+          url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services/nps_parks_mortality_2007_2020/FeatureServer/0",
+          outFields: ["*"],
+          renderer: await setRenderer(),
+          popupTemplate: createPopupTemplateYear()
+        });
+
+        const map = new Map({
+          basemap: "streets-navigation-vector",
+          layers: [layer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-120, 45],
+          zoom: 3
+        });
+
+        let homeWidget = new Home({
+          view: view
+        });
+
+        view.ui.add(homeWidget, "top-right");
+        view.ui.move("zoom", "top-right");
+        const layerView = await view.whenLayerView(layer);
+
+        async function setRenderer() {
+          const symbol = new WebStyleSymbol({
+            name: "park",
+            styleName: "Esri2DPointSymbolsStyle"
+          });
+
+          const cimSymbol = await symbol.fetchCIMSymbol();
+          cimSymbol.data.symbol.symbolLayers[0].size = 24;
+          cimSymbol.data.symbol.symbolLayers[1].size = 0;
+
+          return {
+            type: "simple",
+            symbol: cimSymbol
+          };
+        }
+
+        // There are now multiple types of popups
+        function createPopupTemplateType() {
+            return {
+            title: "{Park}",
+            content: [                  {
+                    fieldName: "Total_Deaths",
+                    label: "Total Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Drowning",
+                    label: "Drowning",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Environmental",
+                    label: "Environmental",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Fall",
+                    label: "Fall",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Homicide",
+                    label: "Homicide",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Legal_Intervention",
+                    label: "Legal Intervention",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Medial_Death",
+                    label: "Medial Death",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Motor_Vehicle_Crash",
+                    label: "Motor Vehicle",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Poisoning",
+                    label: "Poisoning",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Transportation",
+                    label: "Transportation",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Wildlife",
+                    label: "Wildlife",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Other",
+                    label: "Other",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "C_Undetermined",
+                    label: "Undetermined",
+                    format: { digitSeparator: true }
+                  }
+            ]};
+
+        }
+
+        function createPopupTemplateAge() {
+            return {
+            title: "{Park}",
+            content: [{
+                    fieldName: "Total_Deaths",
+                    label: "Total Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "A_0_14",
+                    label: "0 - 14",
+                    format: { digitSeparator: true }
+                  },                  {
+                    fieldName: "A_15_24",
+                    label: "15 - 24",
+                    format: { digitSeparator: true }
+                  },                  {
+                    fieldName: "A_25_34",
+                    label: "25 - 34",
+                    format: { digitSeparator: true }
+                  },                  {
+                    fieldName: "A_35_44",
+                    label: "35 - 44",
+                    format: { digitSeparator: true }
+                  },                  {
+                    fieldName: "A_45_54",
+                    label: "45 - 54",
+                    format: { digitSeparator: true }
+                  },                  {
+                    fieldName: "A_55_65",
+                    label: "55 - 65",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                  fieldName: "A_65_",
+                    label: "65+",
+                    format: { digitSeparator: true }
+                  },                       {
+                    fieldName: "A_Undetermined",
+                    label: "Undetermined",
+                    format: { digitSeparator: true }
+                  }
+            ]};
+        }
+
+        function createPopupTemplateYear() {
+          return {
+            title: "{Park}",
+            content: [
+              {
+                type: "fields",
+                fieldInfos: [
+                {
+                    fieldName: "TOTAL",
+                    label: "Total Visitors",
+                    format: { digitSeparator: true }
+                  }, 
+                  {
+                    fieldName: "Deaths_per_100k",
+                    label: "Deaths per 100k",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2020",
+                    label: "2020 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2019",
+                    label: "2019 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2018",
+                    label: "2018 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2017",
+                    label: "2017 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2016",
+                    label: "2016 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2015",
+                    label: "2015 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2014",
+                    label: "2014 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2013",
+                    label: "2013 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2012",
+                    label: "2012 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2011",
+                    label: "2011 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2010",
+                    label: "2010 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2009",
+                    label: "2009 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2008",
+                    label: "2008 Deaths",
+                    format: { digitSeparator: true }
+                  },
+                  {
+                    fieldName: "Y_2007",
+                    label: "2007 Deaths",
+                    format: { digitSeparator: true }
+                  }
+                ]
+              }
+            ]
+          };
+        }
+
+        const controlVisitedTypeEl = document.getElementById("control-visited-type-el");
+        const controlYearEl = document.getElementById("control-year-el");
+        const controlPopupEl = document.getElementById("control-popup-el"); // Change popup data shown
+        const controlResetEl = document.getElementById("control-reset-el");
+
+        // TODO: Some kind of filter of locations displayed, maybe death rate per 100k? Could also do park total visitors/visitors for year
+        const controlFilterDeathRate = document.getElementById("control-filter-el");
+
+        controlVisitedTypeEl.addEventListener("calciteSegmentedControlChange", async event => {
+          (orderBy = event.target.value), filterItems();
+        });
+        controlYearEl.addEventListener("calciteSelectChange", async event => {
+          (year = event.target.value), filterItems();
+        });
+
+        controlPopupEl.addEventListener("calciteSelectChange", async event => {
+            // TODO: filter
+            event.target.value});
+
+        controlResetEl.addEventListener("click", async () => resetFilters());
+
+        const countDefault = 1;
+        const orderByDefault = "DESC";
+        const yearDefault = "F2020";
+
+        let count = countDefault;
+        let orderBy = orderByDefault;
+        let year = yearDefault;
+
+        async function filterItems() {
+          const query = new TopFeaturesQuery({
+            topFilter: new TopFilter({
+              topCount: count,
+              groupByFields: ["State"],
+              orderByFields: `${year} ${orderBy}`
+            }),
+            orderByFields: `${year} ${orderBy}`,
+            outFields: ["State, F2020, Y_2020, F2019, Y_2019, F2018, Y_2018, F2017, Y_2017, F2016, Y_2016, F2015, Y_2015, F2014, Y_2014, F2013, Y_2013, F2012, Y_2012, F2011, Y_2011, F2010, Y_2010, F2009, Y_2009, F2008, Y_2008, F2007, Y_2007, Park"],
+            returnGeometry: true,
+            cacheHint: false
+          });
+
+          document.getElementById("result-list").innerHTML = "";
+          document.getElementById("result-block").open = true;
+
+          const results = await layer.queryTopFeatures(query);
+          graphics = results.features;
+
+          graphics.forEach((result, index) => {
+            const attributes = result.attributes;
+            const item = document.createElement("calcite-list-item");
+            const chip = document.createElement("calcite-chip");
+            chip.value = attributes.State;
+            chip.slot = "content-end";
+            chip.scale = "s";
+            chip.innerText = attributes.State;
+            item.label = attributes.Park;
+            item.value = index;
+            item.description = `${attributes[year].toLocaleString()} visitors`;
+            item.addEventListener("click", () => resultClickHandler(result, index));
+            item.appendChild(chip);
+            document.getElementById("result-list").appendChild(item);
+          });
+
+          query.orderByFields = [""];
+          const objectIds = await layer.queryTopObjectIds(query);
+          layerView.filter = { objectIds };
+
+          determineResetActionState();
+        }
+
+        function resultClickHandler(result, index) {
+          const popup = graphics && graphics[parseInt(index, 10)];
+          if (popup) {
+            view.openPopup({
+              features: [popup],
+              location: result.geometry
+            });
+            view.goTo({ center: [result.geometry.longitude, result.geometry.latitude], zoom: 4 }, { duration: 400 });
+          }
+        }
+
+        function determineResetActionState() {
+          if (count !== countDefault || orderBy !== orderByDefault || year !== yearDefault) {
+            controlResetEl.removeAttribute("disabled");
+            controlResetEl.indicator = true;
+          } else {
+            controlResetEl.disabled = true;
+            controlResetEl.removeAttribute("indicator");
+          }
+        }
+
+        function resetFilters() {
+          count = countDefault;
+          orderBy = orderByDefault;
+          year = yearDefault;
+
+          const activeSegmentedControlItem = document.querySelector(`calcite-segmented-control-item[value=${orderByDefault}]`);
+          activeSegmentedControlItem.checked = true;
+          controlYearEl.value = yearDefault;
+          controlPopupEl.value = "year"; // *TODO: Default value for popups, make into const strings?
+
+          filterItems();
+        }
+        filterItems();
+      })());
+  </script>
 </html>

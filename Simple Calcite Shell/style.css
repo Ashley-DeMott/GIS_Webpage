@@ -9,3 +9,7 @@ arcgis-map {
   margin: 0;
   padding: 0;
 }
+
+calcite-icon.esri-layer-list__item-content {
+    padding: 100px;
+}

@@ -2,23 +2,26 @@
 <!-- FeatureServers available at https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services-->
 <!--
 Modifications by: Ashley DeMott
-Changed data set to one that includes visitors, injuries, and deaths from 2007 to 2020
+Changed data displayed to show visitors, injuries, and deaths from 2007 to 2020
 
-TODO: Change popup data to specified group of columns (year, age, and type)
+TODO: Change popup data to allow user to see more specifics about injuries/deaths (occurance year, age, and type)
 -->
 
 <html>
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <title>Calcite Components: Core concepts</title>
+	
+	<!-- external scripts -->
     <script type="module" src="https://js.arcgis.com/calcite-components/2.6.0/calcite.esm.js"></script>
+	<script src="https://js.arcgis.com/4.27/"></script>
+	
+	<!-- external stylsheets -->
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.6.0/calcite.css" />
-
-    <script src="https://js.arcgis.com/4.27/"></script>
     <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css" />
 
+	<!-- TODO: Move to own style file -->
     <style>
         html,
         body,
@@ -75,6 +78,7 @@ TODO: Change popup data to specified group of columns (year, age, and type)
                     </calcite-label>
                     <calcite-label>
                         Year data to display
+						<!-- TODO: Use JS to populate options -->
                         <calcite-select id="control-year-el">
                             <calcite-option label="Total Visitors" value="TOTAL"></calcite-option>
                             <calcite-option label="2020 Visitors" value="F2020"></calcite-option>
@@ -135,6 +139,7 @@ TODO: Change popup data to specified group of columns (year, age, and type)
     </calcite-shell>
 </body>
 
+<!-- TOOD: Move to own script file -->
 <script>
     require([
         "esri/Map",
@@ -486,6 +491,7 @@ TODO: Change popup data to specified group of columns (year, age, and type)
                 determineResetActionState();
             }
 
+			// TODO: "outFields" shouldn't be hardcoded. Get keys/sections from the data
             // Sort all items
             async function sortAll() {
                 // Get all the items
@@ -578,5 +584,4 @@ TODO: Change popup data to specified group of columns (year, age, and type)
             filterOutEmpty();
         })());
 </script>
-
 </html>
